@@ -47,7 +47,6 @@ X_test, X_dev, y_test, y_dev = train_test_split(
 )
 
 
-
 #PART: Define the model
 # Create a classifier: a support vector classifier
 clf = svm.SVC()
@@ -55,7 +54,6 @@ clf = svm.SVC()
 #PART: setting up hyperparameter
 hyper_params = {'gamma':GAMMA}
 clf.set_params(**hyper_params)
-
 
 
 #PART: Train model
