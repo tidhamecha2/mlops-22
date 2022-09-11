@@ -19,18 +19,6 @@ h_param_comb = [{'gamma':g, 'C':c} for g in gamma_list for c in c_list]
 
 assert len(h_param_comb) == len(gamma_list)*len(c_list)
 
-
-
-
-
-
-
-
-
-
-
-
-
 train_frac = 0.8
 test_frac = 0.1
 dev_frac = 0.1
