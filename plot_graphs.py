@@ -37,7 +37,21 @@ for ax, image, label in zip(axes, digits.images, digits.target):
 #PART: data pre-processing -- to remove some noise, to normalize data, format the data to be consumed by mode
 # flatten the images
 n_samples = len(digits.images)
+
 data = digits.images.reshape((n_samples, -1))
+label = digits.target
+
+# housekeeping
+del digits
+
+# [1,2,3,4,5,6,7,8,9]
+
+#other types of preprocessing
+    # - image : 8x8 : resize 16x16, 32x32, 4x4 : flatteing
+    # - normalize data: mean normalization: [x - mean(X)]
+    #                 - min-max normalization
+    # - smoothing the image: blur on the image
+
 
 
 #PART: define train/dev/test splits of experiment protocol
@@ -46,7 +60,7 @@ data = digits.images.reshape((n_samples, -1))
 # test to evaluate the performance of the model
 dev_test_frac = 1-train_frac
 X_train, X_dev_test, y_train, y_dev_test = train_test_split(
-    data, digits.target, test_size=dev_test_frac, shuffle=True
+    data, label, test_size=dev_test_frac, shuffle=True
 )
 X_test, X_dev, y_test, y_dev = train_test_split(
     X_dev_test, y_dev_test, test_size=(dev_frac)/dev_test_frac, shuffle=True
@@ -88,8 +102,6 @@ for cur_h_params in h_param_comb:
         best_h_params = cur_h_params
         print("Found new best acc with :"+str(cur_h_params))
         print("New best val accuracy:" + str(cur_acc))
-
-
 
     
 #PART: Get test set predictions
