@@ -1,6 +1,7 @@
 # mlops-22
 Here is the current output of `python plot_graphs.py`
 
+
 Found new best metric with :{'gamma': 0.01, 'C': 0.1}
 New best val metric:0.08839779005524862
 Found new best metric with :{'gamma': 0.01, 'C': 0.5}
@@ -40,5 +41,7 @@ weighted avg       0.97      0.97      0.97       179
 
 Best hyperparameters were:
 {'gamma': 0.0001, 'C': 5}
+```
+
 
 
