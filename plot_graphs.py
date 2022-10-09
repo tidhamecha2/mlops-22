@@ -14,7 +14,8 @@ from utils import (
     h_param_tuning,
     data_viz,
     pred_image_viz,
-    get_all_h_param_comb
+    get_all_h_param_comb,
+    tune_and_save,
 )
 from joblib import dump, load
 
@@ -26,12 +27,10 @@ gamma_list = [0.01, 0.005, 0.001, 0.0005, 0.0001]
 c_list = [0.1, 0.2, 0.5, 0.7, 1, 2, 5, 7, 10]
 
 params = {}
-params['gamma'] = gamma_list
-params['C'] = c_list
+params["gamma"] = gamma_list
+params["C"] = c_list
 
 h_param_comb = get_all_h_param_comb(params)
-
-
 
 
 # PART: load dataset -- data from csv, tsv, jsonl, pickle
@@ -49,21 +48,18 @@ x_train, y_train, x_dev, y_dev, x_test, y_test = train_dev_test_split(
 # PART: Define the model
 # Create a classifier: a support vector classifier
 clf = svm.SVC()
+assert type(clf) == svm.SVC
 # define the evaluation metric
 metric = metrics.accuracy_score
 
 
-best_model, best_metric, best_h_params = h_param_tuning(
-    h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric
+actual_model_path = tune_and_save(
+    clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, model_path=None
 )
-
-# save the best_model
-best_param_config = "_".join([h + "=" + str(best_h_params[h]) for h in best_h_params])
-dump(best_model, "svm_" + best_param_config + ".joblib")
 
 
 # 2. load the best_model
-best_model = load("svm_" + best_param_config + ".joblib")
+best_model = load(actual_model_path)
 
 # PART: Get test set predictions
 # Predict the value of the digit on the test subset
@@ -77,6 +73,3 @@ print(
     f"Classification report for classifier {clf}:\n"
     f"{metrics.classification_report(y_test, predicted)}\n"
 )
-
-print("Best hyperparameters were:")
-print(best_h_params)

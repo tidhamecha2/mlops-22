@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from joblib import dump
+from sklearn import svm
 
 
 def get_all_h_param_comb(params):
@@ -86,3 +88,25 @@ def h_param_tuning(h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric):
             print("Found new best metric with :" + str(cur_h_params))
             print("New best val metric:" + str(cur_metric))
     return best_model, best_metric, best_h_params
+
+
+def tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, model_path):
+    best_model, best_metric, best_h_params = h_param_tuning(
+        h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric
+    )
+
+    # save the best_model
+    best_param_config = "_".join([h + "=" + str(best_h_params[h]) for h in best_h_params])
+    
+    if type(clf) == svm.SVC:
+        model_type = 'svm' 
+
+    best_model_name = model_type + "_" + best_param_config + ".joblib"
+    if model_path == None:
+        model_path = best_model_name
+    dump(best_model, model_path)
+
+    print("Best hyperparameters were:")
+    print(best_h_params)
+
+    return model_path
