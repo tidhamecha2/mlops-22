@@ -20,9 +20,8 @@ def test_get_h_param_comb():
 
     assert len(h_param_comb) == len(gamma_list) * len(c_list)
 
-
-def test_tune_and_save():
-    # 1. set the ranges of hyper parameters
+def helper_h_params():
+    # small number of h params
     gamma_list = [0.01, 0.005]
     c_list = [0.1, 0.2]
 
@@ -30,21 +29,25 @@ def test_tune_and_save():
     params["gamma"] = gamma_list
     params["C"] = c_list
     h_param_comb = get_all_h_param_comb(params)
+    return h_param_comb
 
-    clf = svm.SVC()
-    metric = metrics.accuracy_score
-
-    n, d = 100, 7  # 7 dimensional 100 samples
-
+def helper_create_bin_data(n=100, d=7):
     x_train_0 = np.random.randn(n, d)
     x_train_1 = 1.5 + np.random.randn(n, d)
     x_train = np.vstack((x_train_0, x_train_1))
     y_train = np.zeros(2 * n)
     y_train[n:] = 1
 
-    x_dev = x_train
-    y_dev = y_train
+    return x_train, y_train
 
+def test_tune_and_save():    
+    h_param_comb = helper_h_params()
+    x_train, y_train = helper_create_bin_data(n=100, d=7)
+    x_dev, y_dev = x_train, y_train
+
+    clf = svm.SVC()
+    metric = metrics.accuracy_score
+    
     model_path = "test_run_model_path.joblib"
     actual_model_path = tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, model_path)
 
