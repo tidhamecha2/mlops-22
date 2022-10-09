@@ -109,4 +109,6 @@ def tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, mod
     print("Best hyperparameters were:")
     print(best_h_params)
 
+    print("Best Metric on Dev was:{}".format(best_metric))
+
     return model_path

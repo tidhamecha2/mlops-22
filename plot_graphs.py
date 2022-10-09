@@ -6,7 +6,7 @@
 
 # Import datasets, classifiers and performance metrics
 from sklearn import datasets, svm, metrics
-
+import pdb
 
 from utils import (
     preprocess_digits,
@@ -48,7 +48,6 @@ x_train, y_train, x_dev, y_dev, x_test, y_test = train_dev_test_split(
 # PART: Define the model
 # Create a classifier: a support vector classifier
 clf = svm.SVC()
-assert type(clf) == svm.SVC
 # define the evaluation metric
 metric = metrics.accuracy_score
 
