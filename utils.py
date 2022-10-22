@@ -1,18 +1,37 @@
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score
 from joblib import dump
-from sklearn import svm
+from sklearn import svm, tree
+import pdb
+
+
+def get_all_combs(param_vals, param_name, combs_so_far):
+    new_combs_so_far = []        
+    for c in combs_so_far:        
+        for v in param_vals:
+            cc = c.copy()
+            cc[param_name] = v
+            new_combs_so_far.append(cc)
+    return new_combs_so_far
 
 
 def get_all_h_param_comb(params):
-    h_param_comb = [{"gamma": g, "C": c} for g in params['gamma'] for c in params['C']]
+    h_param_comb = [{}]
+    for p_name in params:
+        h_param_comb = get_all_combs(
+            param_vals=params[p_name], param_name=p_name, combs_so_far=h_param_comb
+        )
+
     return h_param_comb
-    
+
+
 def preprocess_digits(dataset):
     n_samples = len(dataset.images)
     data = dataset.images.reshape((n_samples, -1))
     label = dataset.target
     return data, label
+
 
 # other types of preprocessing
 # - image : 8x8 : resize 16x16, 32x32, 4x4 : flatteing
@@ -39,10 +58,12 @@ def pred_image_viz(x_test, predictions):
         ax.imshow(image, cmap=plt.cm.gray_r, interpolation="nearest")
         ax.set_title(f"Prediction: {prediction}")
 
+
 # PART: define train/dev/test splits of experiment protocol
 # train to train model
 # dev to set hyperparameters of the model
 # test to evaluate the performance of the model
+
 
 def train_dev_test_split(data, label, train_frac, dev_frac):
 
@@ -57,7 +78,7 @@ def train_dev_test_split(data, label, train_frac, dev_frac):
     return x_train, y_train, x_dev, y_dev, x_test, y_test
 
 
-def h_param_tuning(h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric):
+def h_param_tuning(h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric, verbose=False):
     best_metric = -1.0
     best_model = None
     best_h_params = None
@@ -85,30 +106,41 @@ def h_param_tuning(h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric):
             best_metric = cur_metric
             best_model = clf
             best_h_params = cur_h_params
-            print("Found new best metric with :" + str(cur_h_params))
-            print("New best val metric:" + str(cur_metric))
+            if verbose:
+                print("Found new best metric with :" + str(cur_h_params))
+                print("New best val metric:" + str(cur_metric))
     return best_model, best_metric, best_h_params
 
 
-def tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, model_path):
+def tune_and_save(
+    clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, model_path
+):
     best_model, best_metric, best_h_params = h_param_tuning(
         h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric
     )
 
     # save the best_model
-    best_param_config = "_".join([h + "=" + str(best_h_params[h]) for h in best_h_params])
-    
+    best_param_config = "_".join(
+        [h + "=" + str(best_h_params[h]) for h in best_h_params]
+    )
+
     if type(clf) == svm.SVC:
-        model_type = 'svm' 
+        model_type = "svm"
+
+    if type(clf) == tree.DecisionTreeClassifier:
+        model_type = "decision_tree"
 
     best_model_name = model_type + "_" + best_param_config + ".joblib"
     if model_path == None:
         model_path = best_model_name
     dump(best_model, model_path)
 
-    print("Best hyperparameters were:")
-    print(best_h_params)
+    print("Best hyperparameters were:" + str(best_h_params))
 
     print("Best Metric on Dev was:{}".format(best_metric))
 
     return model_path
+
+
+def macro_f1(y_true, y_pred, pos_label=1):
+    return f1_score(y_true, y_pred, pos_label=pos_label, average='macro', zero_division='warn')
