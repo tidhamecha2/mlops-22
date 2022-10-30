@@ -104,8 +104,9 @@ def tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, mod
     best_param_config = "_".join([h + "=" + str(best_h_params[h]) for h in best_h_params])
     
     if type(clf) == svm.SVC:
-        model_type = 'svm' 
-
+        model_type = 'svm'
+    if type(clf) == tree.DecisionTreeClassifier:
+        model_type = 'tree'
     best_model_name = model_type + "_" + best_param_config + ".joblib"
     if model_path == None:
         model_path = best_model_name
@@ -117,3 +118,4 @@ def tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, mod
     print("Best Metric on Dev was:{}".format(best_metric))
 
     return model_path
+    
