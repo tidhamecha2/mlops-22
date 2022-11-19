@@ -2,10 +2,7 @@ import sys, os
 import numpy as np
 from joblib import load
 
-
-sys.path.append(".")
-
-from utils import get_all_h_param_comb, tune_and_save
+from mlops.utils import get_all_h_param_comb, tune_and_save
 from sklearn import svm, metrics
 
 # test case to check if all the combinations of the hyper parameters are indeed getting created
