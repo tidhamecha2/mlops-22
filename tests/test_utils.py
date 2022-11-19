@@ -91,7 +91,6 @@ def test_predicts_all():
 
     assert set(predicted) == set(y_test)
 
-
 # what more test cases should be there
 # irrespective of the changes to the refactored code.
 
