@@ -2,10 +2,11 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score
 from joblib import dump
-from sklearn import svm, tree
+from sklearn import svm, tree, base
 import pdb
+import os
 
-
+MODEL_DIR = "./models"
 def get_all_combs(param_vals, param_name, combs_so_far):
     new_combs_so_far = []        
     for c in combs_so_far:        
@@ -65,26 +66,26 @@ def pred_image_viz(x_test, predictions):
 # test to evaluate the performance of the model
 
 
-def train_dev_test_split(data, label, train_frac, dev_frac):
+def train_dev_test_split(data, label, train_frac, dev_frac, random_state=42):
 
     dev_test_frac = 1 - train_frac
     x_train, x_dev_test, y_train, y_dev_test = train_test_split(
-        data, label, test_size=dev_test_frac, shuffle=True
+        data, label, test_size=dev_test_frac, shuffle=True, random_state=random_state
     )
     x_test, x_dev, y_test, y_dev = train_test_split(
-        x_dev_test, y_dev_test, test_size=(dev_frac) / dev_test_frac, shuffle=True
+        x_dev_test, y_dev_test, test_size=(dev_frac) / dev_test_frac, shuffle=True, random_state=random_state, 
     )
 
     return x_train, y_train, x_dev, y_dev, x_test, y_test
 
 
-def h_param_tuning(h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric, verbose=False):
+def h_param_tuning(h_param_comb, base_clf, x_train, y_train, x_dev, y_dev, metric, verbose=False):
     best_metric = -1.0
     best_model = None
     best_h_params = None
     # 2. For every combination-of-hyper-parameter values
     for cur_h_params in h_param_comb:
-
+        clf = base.clone(base_clf)
         # PART: setting up hyperparameter
         hyper_params = cur_h_params
         clf.set_params(**hyper_params)
@@ -116,7 +117,7 @@ def tune_and_save(
     clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, model_path
 ):
     best_model, best_metric, best_h_params = h_param_tuning(
-        h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric
+        h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric,
     )
 
     # save the best_model
@@ -128,11 +129,11 @@ def tune_and_save(
         model_type = "svm"
 
     if type(clf) == tree.DecisionTreeClassifier:
-        model_type = "decision_tree"
+        model_type = "tree"
 
     best_model_name = model_type + "_" + best_param_config + ".joblib"
     if model_path == None:
-        model_path = best_model_name
+        model_path = os.path.join(MODEL_DIR, best_model_name)
     dump(best_model, model_path)
 
     print("Best hyperparameters were:" + str(best_h_params))
