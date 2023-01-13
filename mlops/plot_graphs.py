@@ -7,7 +7,9 @@
 # Import datasets, classifiers and performance metrics
 from sklearn import datasets, svm, metrics, tree
 import pdb
+import numpy as np
 
+np.random.seed = 5
 from utils import (
     preprocess_digits,
     train_dev_test_split,

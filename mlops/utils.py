@@ -5,6 +5,9 @@ from joblib import dump
 from sklearn import svm, tree
 import pdb
 from skimage.transform import resize
+import numpy as np
+
+np.random.seed = 5
 
 
 def get_all_combs(param_vals, param_name, combs_so_far):
