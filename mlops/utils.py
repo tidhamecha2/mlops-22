@@ -4,11 +4,15 @@ from sklearn.metrics import f1_score
 from joblib import dump
 from sklearn import svm, tree
 import pdb
+from skimage.transform import resize
+import numpy as np
+
+np.random.seed = 5
 
 
 def get_all_combs(param_vals, param_name, combs_so_far):
-    new_combs_so_far = []        
-    for c in combs_so_far:        
+    new_combs_so_far = []
+    for c in combs_so_far:
         for v in param_vals:
             cc = c.copy()
             cc[param_name] = v
@@ -65,14 +69,14 @@ def pred_image_viz(x_test, predictions):
 # test to evaluate the performance of the model
 
 
-def train_dev_test_split(data, label, train_frac, dev_frac):
+def train_dev_test_split(data, label, train_frac, dev_frac,random_state = 2):
 
     dev_test_frac = 1 - train_frac
     x_train, x_dev_test, y_train, y_dev_test = train_test_split(
-        data, label, test_size=dev_test_frac, shuffle=True
+        data, label, test_size=dev_test_frac, shuffle=True,random_state = random_state
     )
     x_test, x_dev, y_test, y_dev = train_test_split(
-        x_dev_test, y_dev_test, test_size=(dev_frac) / dev_test_frac, shuffle=True
+        x_dev_test, y_dev_test, test_size=(dev_frac) / dev_test_frac, shuffle=True,random_state = random_state
     )
 
     return x_train, y_train, x_dev, y_dev, x_test, y_test

@@ -2,12 +2,14 @@
 # License: BSD 3 clause
 
 
-# PART: library dependencies -- sklear, torch, tensorflow, numpy, transformers
+# PART: library dependencies -- sklearn, torch, tensorflow, numpy, transformers
 
 # Import datasets, classifiers and performance metrics
 from sklearn import datasets, svm, metrics, tree
 import pdb
+import numpy as np
 
+np.random.seed = 5
 from utils import (
     preprocess_digits,
     train_dev_test_split,
@@ -47,7 +49,7 @@ del digits
 
 # define the evaluation metric
 metric_list = [metrics.accuracy_score, macro_f1]
-h_metric = metrics.accuracy_score
+h_metric = macro_f1
 
 n_cv = 5
 results = {}
@@ -75,7 +77,7 @@ for n in range(n_cv):
         # Predict the value of the digit on the test subset
         predicted = best_model.predict(x_test)
         if not clf_name in results:
-            results[clf_name]=[]    
+            results[clf_name]=[]
 
         results[clf_name].append({m.__name__:m(y_pred=predicted, y_true=y_test) for m in metric_list})
         # 4. report the test set accurancy with that best model.
